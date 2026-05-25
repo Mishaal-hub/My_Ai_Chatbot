@@ -22,10 +22,13 @@ const client = new OpenAI({
 /* -----------------------------
    TAVILY SEARCH
 ----------------------------- */
+let tvly = null;
 
-const tvly = tavily({
-  apiKey: process.env.TAVILY_API_KEY,
-});
+if (process.env.TAVILY_API_KEY) {
+  tvly = tavily({
+    apiKey: process.env.TAVILY_API_KEY,
+  });
+}
 
 /* -----------------------------
    CHAT ROUTE
@@ -49,12 +52,14 @@ app.post('/chat', async (req, res) => {
     let webData = '';
 
     try {
-      const searchResult =
-        await tvly.search(userMessage);
+      if (tvly) {
+  const searchResult =
+    await tvly.search(userMessage);
 
-      webData = searchResult.results
-        .map((item) => item.content)
-        .join('\n');
+  webData = searchResult.results
+    .map((item) => item.content)
+    .join('\n');
+}
     } catch (searchError) {
       console.log(
         'Search Error:',
@@ -118,7 +123,11 @@ ${webData}
 /* -----------------------------
    SERVER
 ----------------------------- */
-
+app.get('/', (req, res) => {
+  res.json({
+    status: 'Backend Running',
+  });
+});
 app.listen(5000, () => {
   console.log(
     'Server running on port 5000'

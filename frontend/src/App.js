@@ -170,10 +170,13 @@ IMPORTANT RULES:
     setMessage('');
     setLoading(true);
 
-    try {
-      const response = await axios.post(
-        'https://my-ai-chatbot-js9d.onrender.com',
-        {
+    try {const API_URL =
+  process.env.REACT_APP_API_URL ||
+  "https://my-ai-chatbot-js9d.onrender.com";
+
+const response = await axios.post(
+  `${API_URL}/chat`,
+  {
           messages: [
             {
               role: 'system',
