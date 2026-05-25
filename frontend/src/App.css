@@ -1,0 +1,188 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+}
+
+.app {
+  display: flex;
+  height: 100vh;
+  background: #202123;
+  color: white;
+}
+
+/* Sidebar */
+
+.sidebar {
+  width: 260px;
+  background: #111827;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 15px;
+}
+
+.sidebar-top h2 {
+  margin-bottom: 20px;
+}
+
+.sidebar button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: #343541;
+  color: white;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.history {
+  flex: 1;
+  overflow-y: auto;
+  margin-top: 20px;
+}
+
+.history h3 {
+  margin-bottom: 10px;
+}
+
+.history-item {
+  padding: 10px;
+  background: #2a2b32;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.history-item:hover {
+  background: #3b3c45;
+}
+
+/* Main Chat */
+
+.main-chat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-header {
+  padding: 20px;
+  border-bottom: 1px solid #333;
+}
+
+.chat-box {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Messages */
+
+.message {
+  max-width: 80%;
+  padding: 15px;
+  border-radius: 12px;
+  line-height: 1.6;
+}
+
+.user {
+  align-self: flex-end;
+  background: #0b93f6;
+}
+
+.bot {
+  align-self: flex-start;
+  background: #2d2f39;
+}
+
+/* Input */
+
+.input-area {
+  display: flex;
+  gap: 10px;
+  padding: 20px;
+  border-top: 1px solid #333;
+  background: #202123;
+}
+
+.input-area input {
+  flex: 1;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  background: #2d2f39;
+  color: white;
+  font-size: 16px;
+}
+
+.input-area button {
+  padding: 14px 20px;
+  border: none;
+  border-radius: 10px;
+  background: #0b93f6;
+  color: white;
+  cursor: pointer;
+}
+
+.upload-btn {
+  background: #2d2f39;
+  padding: 14px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* Typing */
+
+.typing {
+  color: gray;
+  font-style: italic;
+}
+
+/* Markdown */
+
+pre {
+  background: black;
+  color: #00ff88;
+  padding: 15px;
+  border-radius: 10px;
+  overflow-x: auto;
+}
+
+code {
+  font-family: Consolas, monospace;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th,
+td {
+  border: 1px solid gray;
+  padding: 10px;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+
+  .message {
+    max-width: 95%;
+  }
+}
