@@ -14,17 +14,18 @@ function App() {
   const [message, setMessage] =
     useState('');
 
-  const [messages, setMessages] =
-    useState([]);
+  const [conversations, setConversations] =
+  useState([]);
 
+const [currentChatId, setCurrentChatId] =
+  useState(null);
   const [loading, setLoading] =
     useState(false);
 
   const [darkMode, setDarkMode] =
     useState(true);
 
-  const [chatHistory, setChatHistory] =
-    useState([]);
+  
 
   const [personality, setPersonality] =
     useState('coder');
@@ -35,54 +36,66 @@ function App() {
   const recognitionRef = useRef(null);
   const chatEndRef = useRef(null);
 
+  const currentChat =
+  conversations.find(
+    (chat) => chat.id === currentChatId
+  ) || {
+    messages: [],
+  };
+
   /* -----------------------------
      LOAD SAVED DATA
   ----------------------------- */
 
   useEffect(() => {
-    const savedMessages =
-      localStorage.getItem(
-        'chatMessages'
-      );
+  const savedChats =
+    localStorage.getItem(
+      'conversations'
+    );
 
-    const savedHistory =
-      localStorage.getItem(
-        'chatHistory'
-      );
+  if (savedChats) {
+    const chats =
+      JSON.parse(savedChats);
 
-    if (savedMessages) {
-      setMessages(
-        JSON.parse(savedMessages)
-      );
-    }
+    setConversations(chats);
 
-    if (savedHistory) {
-      setChatHistory(
-        JSON.parse(savedHistory)
+    if (chats.length > 0) {
+      setCurrentChatId(
+        chats[0].id
       );
     }
-  }, []);
+  } else {
+    const firstChat = {
+      id: Date.now(),
+      title: 'New Chat',
+      messages: [],
+    };
 
+    setConversations([
+      firstChat,
+    ]);
+
+    setCurrentChatId(
+      firstChat.id
+    );
+  }
+}, []);
+
+    
   /* -----------------------------
      SAVE DATA
   ----------------------------- */
 
   useEffect(() => {
-    localStorage.setItem(
-      'chatMessages',
-      JSON.stringify(messages)
-    );
+  localStorage.setItem(
+    'conversations',
+    JSON.stringify(
+      conversations
+    )
+  );
 
-    scrollToBottom();
-  }, [messages]);
-
-  useEffect(() => {
-    localStorage.setItem(
-      'chatHistory',
-      JSON.stringify(chatHistory)
-    );
-  }, [chatHistory]);
-
+  scrollToBottom();
+}, [conversations]);
   /* -----------------------------
      AUTO SCROLL
   ----------------------------- */
@@ -156,18 +169,33 @@ IMPORTANT RULES:
     };
 
     const updatedMessages = [
-      ...messages,
-      userMessage,
-    ];
+  ...currentChat.messages,
+  userMessage,
+];
 
-    setMessages(updatedMessages);
+    setConversations(
+  conversations.map((chat) =>
+    chat.id === currentChatId
+      ? {
+          ...chat,
+          title:
+            chat.title ===
+            'New Chat'
+              ? message.substring(
+                  0,
+                  30
+                )
+              : chat.title,
+          messages:
+            updatedMessages,
+        }
+      : chat
+  )
+);
 
-    setChatHistory((prev) => [
-      message,
-      ...prev,
-    ]);
+   ;
 
-    setMessage('');
+    
     setLoading(true);
 
     try {const API_URL =
@@ -209,20 +237,23 @@ const response = await axios.post(
         text: botReply,
       };
 
-      setMessages((prev) => [
-        ...prev,
-        botMessage,
-      ]);
+      setConversations(
+  conversations.map((chat) =>
+    chat.id === currentChatId
+      ? {
+          ...chat,
+          messages: [
+            ...chat.messages,
+            botMessage,
+          ],
+        }
+      : chat
+  )
+);
     } catch (error) {
       console.log(error);
 
-      setMessages((prev) => [
-        ...prev,
-        {
-          sender: 'bot',
-          text: '❌ AI Error',
-        },
-      ]);
+      
     }
 
     setLoading(false);
@@ -242,9 +273,22 @@ const response = await axios.post(
      CLEAR CHAT
   ----------------------------- */
 
-  const clearChat = () => {
-    setMessages([]);
+  const createNewChat = () => {
+  const newChat = {
+    id: Date.now(),
+    title: 'New Chat',
+    messages: [],
   };
+
+  setConversations([
+    newChat,
+    ...conversations,
+  ]);
+
+  setCurrentChatId(
+    newChat.id
+  );
+};
 
   /* -----------------------------
      FILE UPLOAD
@@ -254,13 +298,7 @@ const response = await axios.post(
     const file = e.target.files[0];
 
     if (file) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          sender: 'user',
-          text: `📁 Uploaded: ${file.name}`,
-        },
-      ]);
+      
     }
   };
 
@@ -370,10 +408,10 @@ const response = await axios.post(
           <h2>My AI</h2>
 
           <button
-            onClick={clearChat}
-          >
-            + New Chat
-          </button>
+  onClick={createNewChat}
+>
+  + New Chat
+</button>
 
           {/* PERSONALITY */}
 
@@ -413,16 +451,21 @@ const response = await axios.post(
               Recent Chats
             </h3>
 
-            {chatHistory.map(
-              (item, index) => (
-                <div
-                  key={index}
-                  className="history-item"
-                >
-                  {item}
-                </div>
-              )
-            )}
+           {conversations.map(
+  (chat) => (
+    <div
+      key={chat.id}
+      className="history-item"
+      onClick={() =>
+        setCurrentChatId(
+          chat.id
+        )
+      }
+    >
+      {chat.title}
+    </div>
+  )
+)}
           </div>
         </div>
 
@@ -453,7 +496,7 @@ const response = await axios.post(
         {/* CHAT BOX */}
 
         <div className="chat-box">
-          {messages.map(
+          {currentChat.messages.map(
             (msg, index) => (
               <div
                 key={index}
